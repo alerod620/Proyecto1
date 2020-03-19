@@ -40,15 +40,38 @@ router.post('/registrar', (req, res) => {
             ACL: 'public-read',
         };
 
-        S3.upload(uploadParamsS3, function sync(err, data) {
+        S3.upload(uploadParamsS3, function async(err, data) {
             if (err) {
                 console.log('Error s3:', err);
                 res.status(400).send("No se pudo registrar");
             } else {
                 console.log('Upload success at:', data.Location);
+
+                //parametros de db
+                var paramsdb = {
+                    Item: {
+                        "id": { S: uuidv4() },
+                        "user": { S: user },
+                        "password": { S: password },
+                        "url": { S: data.Location }
+                    },
+                    TableName:"usuarios"
+                };
+                
+                ddb.putItem(paramsdb, function (err, data) {
+                    if (err) {
+                        console.log('Error saving data:', err);
+                        res.send({ 'message': 'ddb failed' });
+                    } else {
+                        console.log('Save success:', data);
+                        res.send({ 'message': 'ddb success' });
+                    }
+                }); 
+
                 res.status(200).send("Registrado");
             }
         });
+
     } else {
         res.status(400).send("No se pudo registrar");
     }
