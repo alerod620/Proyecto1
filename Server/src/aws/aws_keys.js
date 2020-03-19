@@ -3,7 +3,6 @@ let aws_keys = {
         region: 'us-east-2',
         accessKeyId: "",
         secretAccessKey: "",
-        //apiVersion: '2006-03-01',
     },
     dynamodb: {
         apiVersion: '2012-08-10',
