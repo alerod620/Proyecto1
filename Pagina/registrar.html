@@ -158,11 +158,10 @@
 		const registrar = document.getElementById("register");
 
 		function validar() {
-			const realFile = document.getElementById("real-file");
+			//const realFile = document.getElementById("real-file");
 			usuario = document.getElementById("user").value;
 			password = document.getElementById("password").value;
 			cp = document.getElementById("conf-password").value;
-			//var file = this.files[0];
 
 			if (usuario == null || usuario.length == 0 || /^\s+$/.test(usuario)) {
 				swal("¡Debe ingresar un nombre de usuario!", "", "error");

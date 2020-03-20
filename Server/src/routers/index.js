@@ -53,7 +53,7 @@ router.post('/registrar', (req, res) => {
                     },
                     TableName: "usuarios"
                 };
-                
+
                 ddb.putItem(paramsdb, function (err, data) {
                     if (err) {
                         console.log('Error saving data:', err);
@@ -64,15 +64,28 @@ router.post('/registrar', (req, res) => {
                     }
                 });
                 res.status(200).json({ 'message': 'registrado' });
-                
+
             }
         });
 
     } else {
-        res.status(400).json("No se pudo registrar");
+        res.status(400).json({ "message": "No se pudo registrar" });
     }
 
 });
 
+
+router.post('/login', (req, rest) => {
+    let { user, password, extension, imagenBase64 } = req.body;
+
+    if (user && imagenBase64 && extension && (password || password == null)) {
+        console.log(user + " " + extension);
+    } else if (user && password && imagenBase64 == null && extension == null) {
+        console.log(user + " " + password);
+    } else {
+        res.status(400).json({ 'message': 'Error de autenticacion' });
+    }
+
+});
 
 module.exports = router;
