@@ -19,18 +19,14 @@ router.get('/', (req, res) => {
 router.post('/registrar', (req, res) => {
     let { user, password, extension, imagenBase64 } = req.body;
 
-    console.log(user);
-    console.log(password);
-    console.log(extension);
-
     if (imagenBase64 && user && password) {
 
         let image = Buffer.from(imagenBase64, 'base64');
         let filename = `${user}-${uuidv4()}.${extension}`;
 
         //parametros para S3
-        let bucketname = 'bucket-grupo11-prueba';
-        let folder = 'usuarios/';
+        let bucketname = 'bucketfotos-grupo11';
+        let folder = 'Usuarios/';
         let filepath = `${folder}${filename}`;
 
         var uploadParamsS3 = {
@@ -55,7 +51,7 @@ router.post('/registrar', (req, res) => {
                         "password": { S: password },
                         "url": { S: data.Location }
                     },
-                    TableName:"usuarios"
+                    TableName: "usuarios"
                 };
                 
                 ddb.putItem(paramsdb, function (err, data) {
@@ -66,14 +62,14 @@ router.post('/registrar', (req, res) => {
                         console.log('Save success:', data);
                         res.send({ 'message': 'ddb success' });
                     }
-                }); 
-
-                res.status(200).send("Registrado");
+                });
+                res.status(200).json({ 'message': 'registrado' });
+                
             }
         });
 
     } else {
-        res.status(400).send("No se pudo registrar");
+        res.status(400).json("No se pudo registrar");
     }
 
 });
