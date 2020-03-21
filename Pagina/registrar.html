@@ -1,0 +1,220 @@
+<!DOCTYPE HTML>
+<!--
+	Identity by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<style>
+	#drop_zone {
+		border: 2px dashed #bbb;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		border-radius: 5px;
+		padding: 25px;
+		text-align: center;
+		font: 20pt bold 'Vollkorn';
+		color: #bbb;
+	}
+
+	.image-preview {
+		width: 300px;
+		min-height: 100px;
+		border: 2px solid #dddddd;
+		margin-top: 15px;
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: bold;
+		color: #cccccc;
+	}
+
+	.image-preview__image {
+		display: none;
+		width: 100%;
+	}
+</style>
+
+<head>
+	<title>Identity by HTML5 UP</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<noscript>
+		<link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+</head>
+
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Main -->
+		<section id="main">
+			<header>
+				<h1>Registro</h1>
+				<p>Practica 1 - Seminario 1</p>
+			</header>
+
+			<div class="fields">
+				<div class="field">
+					<input type="text" name="Usuario" id="user" placeholder="Usuario" />
+				</div>
+				<br>
+				<div class="field">
+					<input type="password" name="password" id="password" placeholder="Password" />
+				</div>
+				<br>
+				<div class="field">
+					<input type="password" name="conf-password" id="conf-password" placeholder="Conf. password" />
+				</div>
+
+
+				<!--<br>
+			<div id="drop_zone">Arrastra imagen de perfil</div>
+			<output id="list"></output>
+			-->
+
+				<br>
+				<input type="file" id="real-file" hidden="hidden" />
+				<button type="button" id="cargar">Cargar imagen</button>
+
+				<div class="image-preview" id="imagePreview">
+					<img src="" alt="Image Preview" class="image-preview__image">
+					<span class="image-preview__default-text">Imagen</span>
+				</div>
+
+				<br>
+				<button id="register">Registrar</button>
+				<br>
+				<div class="registrar">
+					<label>¿Ya tienes cuenta?</label>
+					<a href="index.html">Iniciar Sesión</a>
+				</div>
+
+
+
+				<hr />
+		</section>
+
+		<!-- Footer -->
+		<footer id="footer">
+			<ul class="copyright">
+				<li>&copy; 201403532, 201404006</li>
+				<li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+			</ul>
+		</footer>
+
+	</div>
+
+	<!-- Scripts -->
+	<script type="text/javascript">
+		if ('addEventListener' in window) {
+			window.addEventListener('load', function () { document.body.className = document.body.className.replace(/\bis-preload\b/, ''); });
+			document.body.className += (navigator.userAgent.match(/(MSIE|rv:11\.0)/) ? ' is-ie' : '');
+		}
+
+		//Variables para imagen 
+		const realFile = document.getElementById("real-file");
+		const botonCargar = document.getElementById("cargar");
+		const previewContainer = document.getElementById("imagePreview");
+		const previewImage = previewContainer.querySelector(".image-preview__image");
+		const previewDefaulText = previewContainer.querySelector(".image-preview__default-text");
+		var file = null;
+
+		botonCargar.addEventListener("click", function () {
+			realFile.click();
+		});
+
+		realFile.addEventListener("change", function () {
+			file = this.files[0];
+
+			if (file) {
+				const reader = new FileReader();
+
+				previewDefaulText.style.display = "none";
+				previewImage.style.display = "block";
+
+				reader.addEventListener("load", function () {
+					previewImage.setAttribute("src", this.result);
+				});
+
+				reader.readAsDataURL(file);
+			}
+			else {
+				previewDefaulText.style.display = null;
+				previewImage.style.display = null;
+
+				previewImage.setAttribute("src", "");
+			}
+		});
+
+
+		//Validar formulario
+		const registrar = document.getElementById("register");
+
+		function validar() {
+			//const realFile = document.getElementById("real-file");
+			usuario = document.getElementById("user").value;
+			password = document.getElementById("password").value;
+			cp = document.getElementById("conf-password").value;
+
+			if (usuario == null || usuario.length == 0 || /^\s+$/.test(usuario)) {
+				swal("¡Debe ingresar un nombre de usuario!", "", "error");
+			}
+			else if (password == null || password.length == 0) {
+				swal("¡Debe ingresar una contraseña!", "", "error");
+			}
+			else if (cp == null || cp.length == 0) {
+				swal("¡Debe confirmar contraseña!", "", "error");
+			}
+			else if (password != cp) {
+				swal("¡La contraseña no coincide!", "", "error");
+			}
+			else if (file == null) {
+				swal("¡No hay fotografia!", "", "success");
+			}
+			else {
+
+				const reader = new FileReader();
+				reader.readAsDataURL(file);
+
+				reader.onloadend = function () {
+					const extension = reader.result.split(";")[0].split("/")[1];
+					const base64 = reader.result.split(",")[1];
+
+					var data = JSON.stringify({
+						"user": usuario,
+						"password": password,
+						"extension": extension,
+						"imagenBase64": base64
+					});
+
+					var url = "http://localhost:3000/registrar";
+					var xhttp = new XMLHttpRequest();
+
+					xhttp.open('POST', url, true);
+					xhttp.setRequestHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+					xhttp.setRequestHeader("Access-Control-Allow_Credentials", 'true');
+					xhttp.setRequestHeader("Accept", "application/json");
+					xhttp.setRequestHeader("Content-Type", "application/json");
+					xhttp.send(data);
+				}
+
+				swal("¡Usuario registrado!", "", "success");
+			}
+
+		}
+
+		registrar.addEventListener("click", function () {
+			validar();
+		});
+	</script>
+
+</body>
+
+</html>
