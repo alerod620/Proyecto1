@@ -11,6 +11,7 @@ let aws_keys = {
         secretAccessKey: ""
     },
     rekognition: {
+        region: 'us-east-2',
         accessKeyId: "",
         secretAccessKey: ""
     }
