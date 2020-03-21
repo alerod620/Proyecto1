@@ -40,38 +40,41 @@ router.post('/registrar', (req, res) => {
             ACL: 'public-read',
         };
 
-        S3.upload(uploadParamsS3, function async(err, data) {
-            if (err) {
-                console.log('Error s3:', err);
-                res.status(400).send("No se pudo registrar");
-            } else {
-                console.log('Upload success at:', data.Location);
+        try {
+            S3.upload(uploadParamsS3, function async(err, data) {
+                if (err) {
+                    console.log('Error s3:', err);
+                    res.status(400).send("No se pudo registrar");
+                } else {
+                    console.log('Upload success at:', data.Location);
 
-                //parametros de db
-                var paramsdb = {
-                    Item: {
-                        "id": { S: uuidv4() },
-                        "user": { S: user },
-                        "password": { S: password },
-                        "url": { S: filepath }
-                    },
-                    TableName: "usuarios"
-                };
+                    //parametros de db
+                    var paramsdb = {
+                        Item: {
+                            "id": { S: uuidv4() },
+                            "user": { S: user },
+                            "password": { S: password },
+                            "url": { S: filepath }
+                        },
+                        TableName: "usuarios"
+                    };
 
-                ddb.putItem(paramsdb, function (err, data) {
-                    if (err) {
-                        console.log('Error saving data:', err);
-                        res.send({ 'message': 'ddb failed' });
-                    } else {
-                        console.log('Save success:', data);
-                        res.send({ 'message': 'ddb success' });
-                    }
-                });
-                res.status(200).json({ 'message': 'registrado' });
+                    ddb.putItem(paramsdb, function (err, data) {
+                        if (err) {
+                            console.log('Error saving data:', err);
+                            res.send({ 'message': 'ddb failed' });
+                        } else {
+                            console.log('Save success:', data);
+                            res.send({ 'message': 'ddb success' });
+                        }
+                    });
+                    res.status(200).json({ 'message': 'registrado' });
 
-            }
-        });
-
+                }
+            });
+        } catch (error) {
+            console.log(error);
+        }
     } else {
         res.status(400).json({ "message": "No se pudo registrar" });
     }
@@ -124,10 +127,10 @@ router.post('/login', (req, res) => {
                         data.Items.forEach(function (user) {
                             var urlImagen = user.url;
                             var nombreUser = user.user;
-        
+
                             console.log(urlImagen);
                             console.log(filepath);
-        
+
                             //objeto rekognition
                             var params = {
                                 SimilarityThreshold: 80,
@@ -144,7 +147,7 @@ router.post('/login', (req, res) => {
                                     }
                                 }
                             };
-        
+
                             rekognition.compareFaces(params, function (err, data) {
                                 if (err) {
                                     console.log(err, err.stack);
@@ -153,7 +156,7 @@ router.post('/login', (req, res) => {
                                     res.status(200).send({ 'data': data });
                                 }
                             });
-        
+
                         });
 
                     }
@@ -161,7 +164,7 @@ router.post('/login', (req, res) => {
 
 
 
-                
+
             }
         };
     } else if (user && password) {
@@ -178,18 +181,28 @@ router.post('/login', (req, res) => {
             if (err) {
                 console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
             } else {
-                data.Items.forEach(function (endb) {
-                    console.log(endb.user == user);
-                    console.log(endb.password == password);
-                    
+                for (let i = 0; data.Count; i++) {
+                    var endb = data.Items[i];
                     if (endb.user === user && endb.password === password) {
                         console.log(endb);
                         res.status(200).send({ 'user': `${endb.user}` });
+                        return;
                     }
+                }
+                res.status(400).send({ 'message': 'Error de autenticacion' });
+
+                /*
+                data.Items.forEach(function (endb) {
+                    console.log(endb.user == user);
+                    console.log(endb.password == password);
+
+                    
                 });
                 res.status(400).send({ 'message': 'Error de autenticacion' });
+                */
             }
         };
+
     } else {
         res.status(400).send({ 'message': 'Error de autenticacion' });
     }
