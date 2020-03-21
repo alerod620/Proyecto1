@@ -231,7 +231,7 @@
 						if (xhttp.status === 200) {
 							var json = JSON.parse(xhttp.responseText);
 							if (user != null) {
-								document.cookie = `username = ${user};`;
+								document.cookie = "usuario=" + usuario;
 								window.location.replace("./sesion.html");
 							} else {
 								swal("¡Error de usuario!", "", "error");
