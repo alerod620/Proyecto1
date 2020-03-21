@@ -189,7 +189,17 @@
 					xhttp.setRequestHeader("Content-Type", "application/json");
 					xhttp.send(data);
 					xhttp.onreadystatechange = function () {
-						console.log(xhttp.response);
+						if (xhttp.status === 200) {
+							var json = JSON.parse(xhttp.responseText);
+							if (user != null) {
+								document.cookie = `username = ${user};`;
+								window.location.replace("./sesion.html");
+							} else {
+								swal("¡Error de usuario!", "", "error");
+							}
+						} else {
+							swal("¡Error de usuario!", "", "error");
+						}
 					};
 				}
 
@@ -229,20 +239,6 @@
 						} else {
 							swal("¡Error de usuario!", "", "error");
 						}
-
-						/*
-						console.log(xhttp.response);
-
-						let { message, user } = xhttp.response;
-						console.log(user);
-
-						if (user != null) {
-							document.cookie = `username = ${user};`;
-							window.location.replace("./sesion.html");
-						} else {
-							swal("¡Error de usuario!", "", "error");
-						}
-						*/
 					};
 				}
 			}

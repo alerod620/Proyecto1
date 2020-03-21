@@ -190,16 +190,6 @@ router.post('/login', (req, res) => {
                     }
                 }
                 res.status(400).send({ 'message': 'Error de autenticacion' });
-
-                /*
-                data.Items.forEach(function (endb) {
-                    console.log(endb.user == user);
-                    console.log(endb.password == password);
-
-                    
-                });
-                res.status(400).send({ 'message': 'Error de autenticacion' });
-                */
             }
         };
 
