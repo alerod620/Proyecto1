@@ -6,6 +6,7 @@
 	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<script src="//cdn.jsdelivr.net/jquery.cookie/1.4.1/jquery.cookie.min.js"></script>
 </head>
 
 <style>
@@ -95,7 +96,7 @@
 
 <script>
 
-	var API_URL = 'https://h3hyzwbwlj.execute-api.us-east-2.amazonaws.com/prod';
+	var API_URL = 'https://h3hyzwbwlj.execute-api.us-east-2.amazonaws.com/prod/bd';
 	var file = null;
 	var user;
 	
@@ -111,7 +112,10 @@
 
 	//Carga las fotos al cargar la pagina
 	$(document).ready(function(){
-	
+		
+		user = Cookie.get('user');
+		
+		/*
 		var name = "Usuario=";
 		var ca = document.cookie.split(';');
 		for(var i=0; i < ca.length; i++)
@@ -131,13 +135,20 @@
 				user = "";
 			}
 		}
+		*/
 		
 		console.log(user);
 	
 		$.ajax({
 			type: 'GET',
 			url: API_URL,
-			data: JSON.stringify({"user": 'Ale'}),
+			data: JSON.stringify({"user": "Ale"}),
+			/*
+			headers: {
+               'Content-Type': "application/json", 
+               'Access-Control-Allow-Origin': '*' 
+			},
+			*/
 			sucess: function(data){
 			
 				data.Items.forEach(function(UsuarioItem){
@@ -219,7 +230,10 @@
 					"extension": extension, 
 					"imagenBase64": base64}
 					),
-					contentType: "application/json"
+					headers: {
+					   'Content-Type': 'application/json', 
+					   'Access-Control-Allow-Origin': '*' 
+					},
 				});
 				
 			}
