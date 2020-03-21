@@ -97,6 +97,7 @@
 
 	var API_URL = 'https://h3hyzwbwlj.execute-api.us-east-2.amazonaws.com/prod';
 	var file = null;
+	var user;
 	
 	const realFile = document.getElementById("real-file");
 	const Cargar = document.getElementById("botonCargar");
@@ -110,6 +111,29 @@
 
 	//Carga las fotos al cargar la pagina
 	$(document).ready(function(){
+	
+		var name = "Usuario=";
+		var ca = document.cookie.split(';');
+		for(var i=0; i < ca.length; i++)
+		{
+			var c = ca[i];
+			while(c.charAt(0) == ' ') 
+			{
+				c = c.substring(1);
+			}
+			
+			if(c.indexOf(name) == 0)
+			{
+				user = unescape(c.substring(name.length, c.length));
+			}
+			else
+			{
+				user = "";
+			}
+		}
+		
+		console.log(user);
+	
 		$.ajax({
 			type: 'GET',
 			url: API_URL,
