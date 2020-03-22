@@ -194,18 +194,27 @@
 						"imagenBase64": base64
 					});
 
-					var url = "http://localhost:3000/registrar";
+					var url = "http://3.21.126.91:3000/registrar";
 					var xhttp = new XMLHttpRequest();
 
 					xhttp.open('POST', url, true);
-					xhttp.setRequestHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+					xhttp.setRequestHeader("Access-Control-Allow-Origin", "http://3.21.126.91:3000");
 					xhttp.setRequestHeader("Access-Control-Allow_Credentials", 'true');
 					xhttp.setRequestHeader("Accept", "application/json");
 					xhttp.setRequestHeader("Content-Type", "application/json");
 					xhttp.send(data);
+					xhttp.onreadystatechange = function () {
+
+						if (xhttp.status === 200) {
+							swal("¡Usuario registrado!", "", "success");
+							location.href = './login.html';
+						} else {
+							swal("¡Error de usuario!", "", "error");
+						}
+					};
 				}
 
-				swal("¡Usuario registrado!", "", "success");
+
 			}
 
 		}

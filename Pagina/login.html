@@ -180,21 +180,21 @@
 						"imagenBase64": base64
 					});
 
-					var url = "http://localhost:3000/login";
+					var url = "http://3.21.126.91:3000/login";
 					var xhttp = new XMLHttpRequest();
 
 					xhttp.open('POST', url, true);
-					xhttp.setRequestHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+					xhttp.setRequestHeader("Access-Control-Allow-Origin", "http://3.21.126.91:3000");
 					xhttp.setRequestHeader("Access-Control-Allow_Credentials", 'true');
 					xhttp.setRequestHeader("Accept", "application/json");
 					xhttp.setRequestHeader("Content-Type", "application/json");
 					xhttp.send(data);
 					xhttp.onreadystatechange = function () {
+
 						if (xhttp.status === 200) {
 							var json = JSON.parse(xhttp.responseText);
-							if (user != null) {
-								document.cookie = `username = ${user};`;
-								window.location.replace("./sesion.html");
+							if (json.user != null) {
+								location.href = './sesion.html?username=' + json.user;
 							} else {
 								swal("¡Error de usuario!", "", "error");
 							}
@@ -218,11 +218,11 @@
 						"password": password
 					});
 
-					var url = "http://localhost:3000/login";
+					var url = "http://3.21.126.91:3000/login" *;
 					var xhttp = new XMLHttpRequest();
 
 					xhttp.open('POST', url, true);
-					xhttp.setRequestHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+					xhttp.setRequestHeader("Access-Control-Allow-Origin", "http://3.21.126.91:3000");
 					xhttp.setRequestHeader("Access-Control-Allow_Credentials", 'true');
 					xhttp.setRequestHeader("Accept", "application/json");
 					xhttp.setRequestHeader("Content-Type", "application/json");
@@ -233,7 +233,6 @@
 							var json = JSON.parse(xhttp.responseText);
 							if (json.user != null) {
 								location.href = './sesion.html?username=' + json.user;
-								//pasarVariables('./sesion.html', json.user);
 							} else {
 								swal("¡Error de usuario!", "", "error");
 							}
