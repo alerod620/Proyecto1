@@ -114,37 +114,12 @@
 	$(document).ready(function(){
 		cadV = location.search.substring(1,location.search.length);
 		arrName = cadV.split('=');
-		console.log(arrName[1]);
-		/*
-		user = Cookie.get('user');
-		
-		var name = "Usuario=";
-		var ca = document.cookie.split(';');
-		for(var i=0; i < ca.length; i++)
-		{
-			var c = ca[i];
-			while(c.charAt(0) == ' ') 
-			{
-				c = c.substring(1);
-			}
-			
-			if(c.indexOf(name) == 0)
-			{
-				user = unescape(c.substring(name.length, c.length));
-			}
-			else
-			{
-				user = "";
-			}
-		}
-		*/
-		
-		console.log(user);
+		var user = arrName[1];
 	
 		$.ajax({
 			type: 'GET',
 			url: API_URL,
-			data: JSON.stringify({"user": "Ale"}),
+			data: JSON.stringify({"user": user}),
 			/*
 			headers: {
                'Content-Type': "application/json", 
