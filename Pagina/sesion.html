@@ -112,10 +112,12 @@
 
 	//Carga las fotos al cargar la pagina
 	$(document).ready(function(){
-		
+		cadV = location.search.substring(1,location.search.length);
+		arrName = cadV.split('=');
+		console.log(arrName[1]);
+		/*
 		user = Cookie.get('user');
 		
-		/*
 		var name = "Usuario=";
 		var ca = document.cookie.split(';');
 		for(var i=0; i < ca.length; i++)
