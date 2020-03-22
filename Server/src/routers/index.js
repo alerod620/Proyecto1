@@ -97,70 +97,71 @@ router.post('/login', (req, res) => {
             allData.scan(params, onScan);
 
             function onScan(err, data) {
-                try {
-                    if (err) {
-                        console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
-                        res.status(400).send({ 'message': 'Error de autenticacion' });
-                    } else {
+                if (err) {
+                    console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
+                    res.status(400).send({ 'message': 'Error de autenticacion' });
+                } else {
 
-                        let image = Buffer.from(imagenBase64, 'base64');
-                        let filename = `${uuidv4()}.${extension}`;
+                    let image = Buffer.from(imagenBase64, 'base64');
+                    let filename = `${uuidv4()}.${extension}`;
 
-                        //parametros para S3
-                        let bucketname = 'bucketfotos-grupo11';
-                        let folder = 'Temporal/';
-                        let filepath = `${folder}${filename}`;
+                    //parametros para S3
+                    let bucketname = 'bucketfotos-grupo11';
+                    let folder = 'Temporal/';
+                    let filepath = `${folder}${filename}`;
 
-                        var uploadParamsS3 = {
-                            Bucket: bucketname,
-                            Key: filepath,
-                            Body: image,
-                            ACL: 'public-read',
-                        };
+                    var uploadParamsS3 = {
+                        Bucket: bucketname,
+                        Key: filepath,
+                        Body: image,
+                        ACL: 'public-read',
+                    };
 
-                        S3.upload(uploadParamsS3, function async(err, dataImage) {
-                            if (err) {
-                                res.status(400).send({ "message": "No se pudo logiar" });
-                            } else {
+                    S3.upload(uploadParamsS3, function async(err, dataImage) {
+                        if (err) {
+                            res.status(400).send({ "message": "No se pudo logiar" });
+                        } else {
 
-                                data.Items.some(function (value) {
-                                    //objeto rekognition
-                                    var params = {
-                                        SimilarityThreshold: 80,
-                                        SourceImage: { /* required */
-                                            S3Object: {
-                                                Bucket: "bucketfotos-grupo11",
-                                                Name: filepath
-                                            }
-                                        },
-                                        TargetImage: { /* required */
-                                            S3Object: {
-                                                Bucket: "bucketfotos-grupo11",
-                                                Name: value.url
-                                            }
+                            data.Items.some(function (value) {
+                                //objeto rekognition
+                                var params = {
+                                    SimilarityThreshold: 80,
+                                    SourceImage: { /* required */
+                                        S3Object: {
+                                            Bucket: "bucketfotos-grupo11",
+                                            Name: filepath
                                         }
-                                    };
+                                    },
+                                    TargetImage: { /* required */
+                                        S3Object: {
+                                            Bucket: "bucketfotos-grupo11",
+                                            Name: value.url
+                                        }
+                                    }
+                                };
 
-                                    rekognition.compareFaces(params, function (err, dataRekognition) {
-                                        if (err) {
-                                            console.log(err, err.stack);
-                                            res.status(400).send({ "message": "No se pudo logiar" });
-                                        } else {
+                                rekognition.compareFaces(params, function (err, dataRekognition) {
+                                    if (err) {
+                                        console.log(err, err.stack);
+                                        res.status(400).send({ "message": "No se pudo logiar" });
+                                    } else {
+                                        try {
                                             if (dataRekognition.FaceMatches[0].Similarity >= 80) {
-                                                try {
-                                                    res.status(200).send({ 'user': `${value.user}` });
-                                                    return;
-                                                } catch (error) {
-
-                                                }
+                                                res.status(200).send({ 'user': `${value.user}` });
+                                                return;
                                             }
+                                        } catch (error) {
+
                                         }
-                                    });
+                                    }
                                 });
-                            }
-                        });
-                    }
-                } catch (error) {
+
+                            });
+                        }
+                    });
+
+
+
 
                 }
             };
@@ -178,13 +179,13 @@ router.post('/login', (req, res) => {
                 if (err) {
                     console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
                 } else {
-                    for (let i = 0; data.Count; i++) {
+                    for (let i = 0; i < data.Count; i++) {
                         var endb = data.Items[i];
                         if (endb.user === user && endb.password === password) {
-                            //console.log(endb);
                             res.status(200).send({ 'user': `${endb.user}` });
                             return;
                         }
+
                     }
                     res.status(400).send({ 'message': 'Error de autenticacion' });
                 }
@@ -193,7 +194,7 @@ router.post('/login', (req, res) => {
             res.status(400).send({ 'message': 'Error de autenticacion' });
         }
     } catch (error) {
-        //res.status(400).send({ 'message': 'Error de autenticacion' });
+        res.status(400).send({ 'message': 'Error de autenticacion' });
     }
 
 });
