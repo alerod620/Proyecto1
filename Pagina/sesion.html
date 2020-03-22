@@ -78,7 +78,7 @@
 <div class="contenido">
 	<img src="bar.png" alt="" class="menu-bar"> 
 	
-	<div class="fotos">
+	<div class="fotos" id="fotos-div">
 		<input type="file" id="real-file" name="files[]" hidden="hidden" multiple/>
 		<button type="button" id="botonCargar">Cargar imagen</button>
 	</div>
@@ -95,7 +95,7 @@
 
 <script>
 
-	var API_URL = "https://cors-anywhere.herokuapp.com/https://h3hyzwbwlj.execute-api.us-east-2.amazonaws.com/prod/bd";
+	var API_URL = "https://cors-anywhere.herokuapp.com/https://h3hyzwbwlj.execute-api.us-east-2.amazonaws.com/prod/ob";
 	var user;
 	
 	const realFile = document.getElementById("real-file");
@@ -134,21 +134,29 @@
 		
 		console.log(user);
 		
+		
 		var info = JSON.stringify({ "user":"Ale" });
 		console.log(info);
-		var http = new XMLHttpRequest();
-
-		http.open('GET', API_URL, true);
-		http.setRequestHeader("Access-Control-Allow-Origin", "*");
-		http.setRequestHeader("Access-Control-Allow_Credentials", 'true');
-		http.setRequestHeader("Accept", "application/json");
-		http.setRequestHeader("Content-Type", "application/json");
-		http.onload = () => {
-			const dato = JSON.parse(http.response);
-			console.log(dato);
-		};
-		http.send(info);
 		
+		var ht = new XMLHttpRequest();
+		var dato = "";
+
+		ht.open('POST', API_URL, true);
+		ht.setRequestHeader("Access-Control-Allow-Origin", "*");
+		ht.setRequestHeader("Access-Control-Allow_Credentials", 'true');
+		ht.setRequestHeader("Accept", "application/json");
+		ht.setRequestHeader("Content-Type", "application/json");
+		ht.send(info);
+		ht.onload = () => {
+			dato = ht.response;
+			var fo = dato.split(" ");
+			console.log(dato);
+			for(var i=0; i < fo.length - 1; i++)
+			{
+				console.log(fo[i]);
+				crear_foto(fo[i]);
+			}
+		};
 		
 		
 		
@@ -156,8 +164,7 @@
 		$.ajax({
 			type: 'GET',
 			url: API_URL,
-			dataType: "json",
-			data: JSON.stringify( { "user" : "Ale" } ),
+			data: JSON.stringify({ "user" : "Ale" }),
 			
 			sucess: function(data){
 				console.log("Entro al GET");
@@ -170,7 +177,6 @@
 			}
 		});
 		*/
-		
 	});
 
 	$('.albumes').hide();
@@ -220,12 +226,12 @@
 				var base64 = reader.result.split(",")[1];
 				console.log(base64);
 				
-				var data = JSON.stringify({"user": "Ale", "extension": extension, "imagen": base64});
-				
+				var data = JSON.stringify({user: "Ale", extension: extension, imagenBase64: base64});
+				console.log(data);
 				var xhttp = new XMLHttpRequest();
 
 				xhttp.open('POST', API_URL, true);
-				xhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhttp.setRequestHeader("Access-Control-Allow-Origin", '*');
 				xhttp.setRequestHeader("Access-Control-Allow_Credentials", 'true');
 				xhttp.setRequestHeader("Accept", "application/json");
 				xhttp.setRequestHeader("Content-Type", "application/json");
@@ -249,19 +255,15 @@
 		//location.reload();
 	}
 	document.getElementById('real-file').addEventListener('change', handleFileSelect, false);
-  /*
+  
   //Codigo para agregar fotos dinamicamente
-  var up = document.getElementById('GFG_UP');  
-        up.innerHTML = "Click on the button to add image element";  
-        var down = document.getElementById('GFG_DOWN');  
-          
-        function GFG_Fun() { 
-            var img = document.createElement('img'); 
-            img.src =  ''; 
-            document.getElementById('body').appendChild(img); 
-            down.innerHTML = "Image Element Added.";  
-        }  
-	*/
+  
+	function crear_foto(src) { 
+		var img = document.createElement('img'); 
+		img.src =  src; 
+		document.getElementById("fotos-div").appendChild(img); 
+	}  
+	
 </script>
 
 </html>
