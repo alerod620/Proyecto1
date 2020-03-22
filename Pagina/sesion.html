@@ -6,7 +6,6 @@
 	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/jquery.cookie/1.4.1/jquery.cookie.min.js"></script>
 </head>
 
 <style>
@@ -96,8 +95,7 @@
 
 <script>
 
-	var API_URL = 'https://h3hyzwbwlj.execute-api.us-east-2.amazonaws.com/prod/bd';
-	var file = null;
+	var API_URL = "https://cors-anywhere.herokuapp.com/https://h3hyzwbwlj.execute-api.us-east-2.amazonaws.com/prod/bd";
 	var user;
 	
 	const realFile = document.getElementById("real-file");
@@ -113,9 +111,7 @@
 	//Carga las fotos al cargar la pagina
 	$(document).ready(function(){
 		
-		user = Cookie.get('user');
 		
-		/*
 		var name = "Usuario=";
 		var ca = document.cookie.split(';');
 		for(var i=0; i < ca.length; i++)
@@ -135,22 +131,18 @@
 				user = "";
 			}
 		}
-		*/
 		
 		console.log(user);
-	
+		
+		/*
 		$.ajax({
 			type: 'GET',
 			url: API_URL,
-			data: JSON.stringify({"user": "Ale"}),
-			/*
-			headers: {
-               'Content-Type': "application/json", 
-               'Access-Control-Allow-Origin': '*' 
-			},
-			*/
-			sucess: function(data){
+			dataType: "json",
+			data: JSON.stringify( { "user" : "Ale" } ),
 			
+			sucess: function(data){
+				console.log("Entro al GET");
 				data.Items.forEach(function(UsuarioItem){
 					var img = document.createElement('img'); 
 					console.log(UsuarioItem.Foto);
@@ -159,8 +151,8 @@
 				})
 			}
 		});
+		*/
 		
-		console.log('GET');
 	});
 
 	$('.albumes').hide();
@@ -208,34 +200,31 @@
 			reader.onloadend = function () {
 				var extension = reader.result.split(";")[0].split("/")[1];
 				var base64 = reader.result.split(",")[1];
+				console.log(base64);
 				
-				/*
-				var data = JSON.stringify({"user": "ale", "extension": extension, "imagen": base64});
+				var data = JSON.stringify({"user": "Ale", "extension": extension, "imagen": base64});
 				
 				var xhttp = new XMLHttpRequest();
 
 				xhttp.open('POST', API_URL, true);
-				xhttp.setRequestHeader("Access-Control-Allow-Origin", API_URL);
+				xhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
 				xhttp.setRequestHeader("Access-Control-Allow_Credentials", 'true');
 				xhttp.setRequestHeader("Accept", "application/json");
 				xhttp.setRequestHeader("Content-Type", "application/json");
 				xhttp.send(data);
-				*/
 				
+				
+				/*
 				$.ajax({
 					type: 'POST',
 					url: API_URL,
+					dataType: "json",
 					data: JSON.stringify({
-					"user": 'Ale', 
+					"user": "Ale",
 					"extension": extension, 
-					"imagenBase64": base64}
-					),
-					headers: {
-					   'Content-Type': 'application/json', 
-					   'Access-Control-Allow-Origin': '*' 
-					},
+					"imagenBase64": base64})
 				});
-				
+				*/
 			}
 			
 		}
