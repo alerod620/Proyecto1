@@ -7,6 +7,7 @@
 <html>
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="//cdn.jsdelivr.net/jquery.cookie/1.4.1/jquery.cookie.min.js"></script>
 
 <head>
 	<title>Identity by HTML5 UP</title>
@@ -189,7 +190,17 @@
 					xhttp.setRequestHeader("Content-Type", "application/json");
 					xhttp.send(data);
 					xhttp.onreadystatechange = function () {
-						console.log(xhttp.response);
+						if (xhttp.status === 200) {
+							var json = JSON.parse(xhttp.responseText);
+							if (user != null) {
+								document.cookie = `username = ${user};`;
+								window.location.replace("./sesion.html");
+							} else {
+								swal("¡Error de usuario!", "", "error");
+							}
+						} else {
+							swal("¡Error de usuario!", "", "error");
+						}
 					};
 				}
 
@@ -217,7 +228,18 @@
 					xhttp.setRequestHeader("Content-Type", "application/json");
 					xhttp.send(data);
 					xhttp.onreadystatechange = function () {
-						console.log(xhttp.response);
+
+						if (xhttp.status === 200) {
+							var json = JSON.parse(xhttp.responseText);
+							if (json.user != null) {
+								location.href = './sesion.html?username=' + json.user;
+								//pasarVariables('./sesion.html', json.user);
+							} else {
+								swal("¡Error de usuario!", "", "error");
+							}
+						} else {
+							swal("¡Error de usuario!", "", "error");
+						}
 					};
 				}
 			}

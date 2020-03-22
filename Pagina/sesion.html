@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Sesion</title>
+	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/jquery.cookie/1.4.1/jquery.cookie.min.js"></script>
+</head>
+
+<style>
+
+	body {
+		margin:0;
+		font-family:sans-serif;
+	}
+	
+	.sidebar {
+		position: absolute;
+		width: 200px;
+		height: 100%;	
+		background:#333;
+		color:#fff;
+		outline: 1px solid #2a2a2a;
+	}
+	.sidebar ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+	.sidebar h2 {
+		text-align: center;
+		margin:0;
+		padding:10px;
+		background:#2a2a2a;
+	}
+	.sidebar li {
+		outline: 1px solid #2a2a2a;
+		transition: border 0.3s;
+	}
+	.sidebar li:hover {
+		background: #444;
+		border-left:5px solid #eee;
+	}
+	.sidebar a {
+		display:block;
+		color:#fff;
+		text-decoration: none;
+		padding:10px;
+	}
+	.contenido {
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		background: #eee;
+		padding:10px;
+		transition: all 0.4s;
+	}
+	.menu-bar {
+		cursor: pointer;
+	}
+	.abrir {
+		transform: translateX(200px);
+	}
+
+</style>
+
+<body>
+<div class="sidebar">
+	<h2>MENU</h2>
+	<ul>
+		<li><a href="#" onclick="mostrar_fotos()" id="f1">Fotos</a></li>
+		<li><a href="#" onclick="mostrar_album()" id="f2">Albumes</a></li>
+		<li><a href="#" onclick="mostrar_fotos_a()" id="f3">Fotos en las que apareces</a></li>
+		<li><a href="#">Salir</a></li>
+	</ul>
+</div>
+<div class="contenido">
+	<img src="bar.png" alt="" class="menu-bar"> 
+	
+	<div class="fotos">
+		<input type="file" id="real-file" name="files[]" hidden="hidden" multiple/>
+		<button type="button" id="botonCargar">Cargar imagen</button>
+	</div>
+	
+	<div class="albumes">
+		 
+	</div>
+	
+	<div class="aparece">
+		
+	</div>	
+</div>
+</body>
+
+<script>
+
+	var API_URL = 'https://h3hyzwbwlj.execute-api.us-east-2.amazonaws.com/prod/bd';
+	var file = null;
+	var user;
+	
+	const realFile = document.getElementById("real-file");
+	const Cargar = document.getElementById("botonCargar");
+	
+	Cargar.addEventListener("click", function(){
+		console.log("Clickeo cargar");
+		realFile.click();
+	});
+	
+	
+
+	//Carga las fotos al cargar la pagina
+	$(document).ready(function(){
+		cadV = location.search.substring(1,location.search.length);
+		arrName = cadV.split('=');
+		var user = arrName[1];
+	
+		$.ajax({
+			type: 'GET',
+			url: API_URL,
+			data: JSON.stringify({"user": user}),
+			/*
+			headers: {
+               'Content-Type': "application/json", 
+               'Access-Control-Allow-Origin': '*' 
+			},
+			*/
+			sucess: function(data){
+			
+				data.Items.forEach(function(UsuarioItem){
+					var img = document.createElement('img'); 
+					console.log(UsuarioItem.Foto);
+					img.src = UsuarioItem.Foto;
+					document.getElementById('fotos').appendChild(img);
+				})
+			}
+		});
+		
+		console.log('GET');
+	});
+
+	$('.albumes').hide();
+	$('.aparece').hide();
+
+	$('.menu-bar').on('click', function() {
+		$('.contenido').toggleClass('abrir');
+	});
+	
+	function mostrar_fotos()
+	{
+		$('.fotos').show();
+		$('.albumes').hide();
+		$('.aparece').hide();
+	}
+	
+	function mostrar_album()
+	{
+		$('.fotos').hide();
+		$('.albumes').show();
+		$('.aparece').hide();
+	}
+	
+	function mostrar_fotos_a()
+	{
+		$('.fotos').hide();
+		$('.albumes').hide();
+		$('.aparece').show();
+	}
+	
+	
+	//Codigo para boton de subir imagenes
+	function handleFileSelect(evt) {
+		
+		var files = evt.target.files; // FileList object
+		var reader = new FileReader();
+		
+		// files is a FileList of File objects. List some properties.
+		for (var i = 0, f; f = files[i]; i++) {
+		
+			var reader = new FileReader();
+			reader.readAsDataURL(f);
+			console.log(f);
+
+			reader.onloadend = function () {
+				var extension = reader.result.split(";")[0].split("/")[1];
+				var base64 = reader.result.split(",")[1];
+				
+				/*
+				var data = JSON.stringify({"user": "ale", "extension": extension, "imagen": base64});
+				
+				var xhttp = new XMLHttpRequest();
+
+				xhttp.open('POST', API_URL, true);
+				xhttp.setRequestHeader("Access-Control-Allow-Origin", API_URL);
+				xhttp.setRequestHeader("Access-Control-Allow_Credentials", 'true');
+				xhttp.setRequestHeader("Accept", "application/json");
+				xhttp.setRequestHeader("Content-Type", "application/json");
+				xhttp.send(data);
+				*/
+				
+				$.ajax({
+					type: 'POST',
+					url: API_URL,
+					data: JSON.stringify({
+					"user": 'Ale', 
+					"extension": extension, 
+					"imagenBase64": base64}
+					),
+					headers: {
+					   'Content-Type': 'application/json', 
+					   'Access-Control-Allow-Origin': '*' 
+					},
+				});
+				
+			}
+			
+		}
+		//location.reload();
+	}
+	document.getElementById('real-file').addEventListener('change', handleFileSelect, false);
+  /*
+  //Codigo para agregar fotos dinamicamente
+  var up = document.getElementById('GFG_UP');  
+        up.innerHTML = "Click on the button to add image element";  
+        var down = document.getElementById('GFG_DOWN');  
+          
+        function GFG_Fun() { 
+            var img = document.createElement('img'); 
+            img.src =  ''; 
+            document.getElementById('body').appendChild(img); 
+            down.innerHTML = "Image Element Added.";  
+        }  
+	*/
+</script>
+
+</html>
