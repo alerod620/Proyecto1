@@ -84,11 +84,11 @@
 		<br><br>
 	</div>
 	
-	<div class="albumes">
+	<div class="albumes" id="albumes-div">
 		 
 	</div>
 	
-	<div class="aparece">
+	<div class="aparece" id="aparace-div">
 		
 	</div>	
 </div>
@@ -98,7 +98,7 @@
 
 	var API_URL = "https://cors-anywhere.herokuapp.com/https://h3hyzwbwlj.execute-api.us-east-2.amazonaws.com/prod/ob";
 	var API_GUARDAR = "https://cors-anywhere.herokuapp.com/https://h3hyzwbwlj.execute-api.us-east-2.amazonaws.com/prod/guardar";
-	var user;
+	var user = "servidor";
 	
 	const realFile = document.getElementById("real-file");
 	const Cargar = document.getElementById("botonCargar");
@@ -113,33 +113,13 @@
 	//Carga las fotos al cargar la pagina
 	$(document).ready(function(){
 		
-		
-		var name = "Usuario=";
-		var ca = document.cookie.split(';');
-		for(var i=0; i < ca.length; i++)
-		{
-			var c = ca[i];
-			while(c.charAt(0) == ' ') 
-			{
-				c = c.substring(1);
-			}
-			
-			if(c.indexOf(name) == 0)
-			{
-				user = unescape(c.substring(name.length, c.length));
-			}
-			else
-			{
-				user = "";
-			}
-		}
-		
-		pedir_fotos(user);
+		pedir_fotos(user, "Usuario");
+		pedir_fotos(user, "Aparece");
 	});
 	
-	function pedir_fotos(user)
+	function pedir_fotos(user, tabla)
 	{
-		var info = JSON.stringify({ "user":user });
+		var info = JSON.stringify({ "user":user, "tabla":tabla });
 		
 		var ht = new XMLHttpRequest();
 		var dato = "";
@@ -155,7 +135,7 @@
 			var fo = dato.split(" ");
 			for(var i=0; i < fo.length; i++)
 			{
-				crear_foto(fo[i]);
+				crear_foto(fo[i], tabla);
 			}
 		};
 	}
@@ -195,8 +175,6 @@
 		var files = evt.target.files; // FileList object
 		var reader = new FileReader();
 		var data = "{";
-		var extension = "";
-		var base64 = "";
 		console.log(data);
 		// files is a FileList of File objects. List some properties.
 		for (var i = 0, f; f = files[i]; i++) {
@@ -205,9 +183,10 @@
 			reader.readAsDataURL(f);
 			console.log(f);
 			reader.onloadend = function () {
-				extension = reader.result.split(";")[0].split("/")[1];
-				base64 = reader.result.split(",")[1];
-				var d = JSON.stringify({"user": "Ale", "extension":extension,  "imagenBase64":base64});
+				var extension = reader.result.split(";")[0].split("/")[1];
+				var base64 = reader.result.split(",")[1];
+				console.log(base64);
+				var d = JSON.stringify({"user": user, "extension":extension,  "imagenBase64":base64});
 				subir_foto(d);
 			}
 			
@@ -234,13 +213,20 @@
   
   //Codigo para agregar fotos dinamicamente
   
-	function crear_foto(src) { 
+	function crear_foto(src, div) { 
 		var img = document.createElement('img'); 
 		img.src =  src;
 		img.width = 250;
 		img.height = 150;
 		img.hspace="4";
-		document.getElementById("fotos-div").appendChild(img); 
+		if(div == "Usuario")
+		{
+			document.getElementById("fotos-div").appendChild(img); 
+		}
+		else if(div == "Aparece")
+		{
+			document.getElementById("aparace-div").appendChild(img);
+		}
 	}  
 	
 </script>
