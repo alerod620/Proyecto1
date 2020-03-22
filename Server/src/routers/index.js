@@ -62,13 +62,12 @@ router.post('/registrar', (req, res) => {
                     ddb.putItem(paramsdb, function (err, data) {
                         if (err) {
                             console.log('Error saving data:', err);
-                            res.send({ 'message': 'ddb failed' });
+                            res.status(400).json({ "message": "No se pudo registrar" });
                         } else {
                             console.log('Save success:', data);
-                            res.send({ 'message': 'ddb success' });
+                            res.status(200).json({ 'message': 'registrado' });
                         }
                     });
-                    res.status(200).json({ 'message': 'registrado' });
 
                 }
             });
@@ -98,73 +97,70 @@ router.post('/login', (req, res) => {
             allData.scan(params, onScan);
 
             function onScan(err, data) {
-                if (err) {
-                    console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
-                } else {
+                try {
+                    if (err) {
+                        console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
+                        res.status(400).send({ 'message': 'Error de autenticacion' });
+                    } else {
 
-                    let image = Buffer.from(imagenBase64, 'base64');
-                    let filename = `${uuidv4()}.${extension}`;
+                        let image = Buffer.from(imagenBase64, 'base64');
+                        let filename = `${uuidv4()}.${extension}`;
 
-                    //parametros para S3
-                    let bucketname = 'bucketfotos-grupo11';
-                    let folder = 'Temporal/';
-                    let filepath = `${folder}${filename}`;
+                        //parametros para S3
+                        let bucketname = 'bucketfotos-grupo11';
+                        let folder = 'Temporal/';
+                        let filepath = `${folder}${filename}`;
 
-                    var uploadParamsS3 = {
-                        Bucket: bucketname,
-                        Key: filepath,
-                        Body: image,
-                        ACL: 'public-read',
-                    };
+                        var uploadParamsS3 = {
+                            Bucket: bucketname,
+                            Key: filepath,
+                            Body: image,
+                            ACL: 'public-read',
+                        };
 
-                    S3.upload(uploadParamsS3, function async(err, dataImage) {
-                        if (err) {
-                            console.log('Error s3:', err);
-                            res.status(400).send({ "message": "No se pudo logiar" });
-                        } else {
-                            console.log('Upload success at:', dataImage.Location);
+                        S3.upload(uploadParamsS3, function async(err, dataImage) {
+                            if (err) {
+                                res.status(400).send({ "message": "No se pudo logiar" });
+                            } else {
 
-
-                            data.Items.forEach(function (user) {
-                                var urlImagen = user.url;
-                                var nombreUser = user.user;
-
-                                console.log(urlImagen);
-                                console.log(filepath);
-
-                                //objeto rekognition
-                                var params = {
-                                    SimilarityThreshold: 80,
-                                    SourceImage: { /* required */
-                                        S3Object: {
-                                            Bucket: "bucketfotos-grupo11",
-                                            Name: filepath
+                                data.Items.some(function (value) {
+                                    //objeto rekognition
+                                    var params = {
+                                        SimilarityThreshold: 80,
+                                        SourceImage: { /* required */
+                                            S3Object: {
+                                                Bucket: "bucketfotos-grupo11",
+                                                Name: filepath
+                                            }
+                                        },
+                                        TargetImage: { /* required */
+                                            S3Object: {
+                                                Bucket: "bucketfotos-grupo11",
+                                                Name: value.url
+                                            }
                                         }
-                                    },
-                                    TargetImage: { /* required */
-                                        S3Object: {
-                                            Bucket: "bucketfotos-grupo11",
-                                            Name: urlImagen
-                                        }
-                                    }
-                                };
+                                    };
 
-                                rekognition.compareFaces(params, function (err, data) {
-                                    if (err) {
-                                        console.log(err, err.stack);
-                                    } else {
-                                        console.log(data);
-                                        res.status(200).send({ 'data': data });
-                                    }
+                                    rekognition.compareFaces(params, function (err, dataRekognition) {
+                                        if (err) {
+                                            console.log(err, err.stack);
+                                            res.status(400).send({ "message": "No se pudo logiar" });
+                                        } else {
+                                            if (dataRekognition.FaceMatches[0].Similarity >= 80) {
+                                                try {
+                                                    res.status(200).send({ 'user': `${value.user}` });
+                                                    return;
+                                                } catch (error) {
+
+                                                }
+                                            }
+                                        }
+                                    });
                                 });
-
-                            });
-
-                        }
-                    });
-
-
-
+                            }
+                        });
+                    }
+                } catch (error) {
 
                 }
             };
@@ -185,7 +181,7 @@ router.post('/login', (req, res) => {
                     for (let i = 0; data.Count; i++) {
                         var endb = data.Items[i];
                         if (endb.user === user && endb.password === password) {
-                            console.log(endb);
+                            //console.log(endb);
                             res.status(200).send({ 'user': `${endb.user}` });
                             return;
                         }
@@ -193,12 +189,11 @@ router.post('/login', (req, res) => {
                     res.status(400).send({ 'message': 'Error de autenticacion' });
                 }
             };
-
         } else {
             res.status(400).send({ 'message': 'Error de autenticacion' });
         }
     } catch (error) {
-        res.status(400).send({ 'message': 'Error de autenticacion' });
+        //res.status(400).send({ 'message': 'Error de autenticacion' });
     }
 
 });
