@@ -112,6 +112,7 @@
 
 	//Carga las fotos al cargar la pagina
 	$(document).ready(function(){
+<<<<<<< HEAD
 		
 		pedir_fotos(user, "Usuario");
 		pedir_fotos(user, "Aparece");
@@ -136,6 +137,30 @@
 			for(var i=0; i < fo.length; i++)
 			{
 				crear_foto(fo[i], tabla);
+=======
+		cadV = location.search.substring(1,location.search.length);
+		arrName = cadV.split('=');
+		var user = arrName[1];
+	
+		$.ajax({
+			type: 'GET',
+			url: API_URL,
+			data: JSON.stringify({"user": user}),
+			/*
+			headers: {
+               'Content-Type': "application/json", 
+               'Access-Control-Allow-Origin': '*' 
+			},
+			*/
+			sucess: function(data){
+			
+				data.Items.forEach(function(UsuarioItem){
+					var img = document.createElement('img'); 
+					console.log(UsuarioItem.Foto);
+					img.src = UsuarioItem.Foto;
+					document.getElementById('fotos').appendChild(img);
+				})
+>>>>>>> EverChicas
 			}
 		};
 	}
@@ -193,6 +218,7 @@
 		}
 	}
 	document.getElementById('real-file').addEventListener('change', handleFileSelect, false);
+<<<<<<< HEAD
   
 	//Funcion para subir foto
 	function subir_foto(data)
@@ -229,6 +255,9 @@
 		}
 	}  
 	
+=======
+
+>>>>>>> EverChicas
 </script>
 
 </html>
