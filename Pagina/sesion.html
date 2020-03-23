@@ -98,7 +98,7 @@
 
 	var API_URL = "https://cors-anywhere.herokuapp.com/https://h3hyzwbwlj.execute-api.us-east-2.amazonaws.com/prod/ob";
 	var API_GUARDAR = "https://cors-anywhere.herokuapp.com/https://h3hyzwbwlj.execute-api.us-east-2.amazonaws.com/prod/guardar";
-	var user = "servidor";
+	var user = "";
 	
 	const realFile = document.getElementById("real-file");
 	const Cargar = document.getElementById("botonCargar");
@@ -112,6 +112,9 @@
 
 	//Carga las fotos al cargar la pagina
 	$(document).ready(function(){
+		cadV = location.search.substring(1, location.search.length);
+		arrName = cadV.split('=');
+		var user = arrName[1];
 		
 		pedir_fotos(user, "Usuario");
 		pedir_fotos(user, "Aparece");
