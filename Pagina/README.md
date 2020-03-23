@@ -1,8 +1,10 @@
 # Practica 1 - Seminario 1
 
-## COMPONENTES 
-* Servidor nodejs
-* Servicios de aws
+## SERVICIOS DE AWS
+* API GateWay
+* DynamoDB
+* Rekognition
+* Lambda
 
 ### SERVIDOR NODEJS
 
