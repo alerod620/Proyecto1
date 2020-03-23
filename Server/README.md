@@ -18,6 +18,6 @@
 ## URL API
 
 | URL | METODO | ACCION |
-|-----|:------:|:------:|
+|:---:|:------:|:------:|
 |registrar|POST|Registrar un usuario en el sistema|
 |login | POST| Da acceso al sitio web, por medio de foto o credenciales|
