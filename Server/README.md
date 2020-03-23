@@ -1,13 +1,13 @@
 # PRACTICA 1 SEMINARIO 1
 
 ## COMPONETES DE SERVIDOR
- 1. AWS
- ..* S3
- ..* DynamoDB
- ..* Rekognition
+ ### AWS
+ * S3
+ * DynamoDB
+ * Rekognition
 
- 2. NODEJS
- ..* Correr servidor
+ ### NODEJS
+ * Correr servidor
  ``` npm install```
  ``` npm run dev```
 
